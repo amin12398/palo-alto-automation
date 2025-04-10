@@ -1,0 +1,32 @@
+- name: Automate Loopback Interface Creation on Palo Alto
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120"  # Your Palo Alto firewall IP
+      username: "admin"             # Your Palo Alto admin username
+      password: "admin"             # Your Palo Alto admin password
+      port: 443                     # Default port for HTTPS
+
+    interface_name: "loopback"     # Name of the loopback interface
+    interface_ip: "192.168.200.1/32"  # IP address for the loopback interface (use /32 for loopbacks)
+    interface_zone: "trust"           # Security zone for the interface (you can use a zone like trust)
+
+  tasks:
+    - name: Create the Loopback Interface
+      paloaltonetworks.panos.panos_interface:
+        provider: "{{ palo_provider }}"
+        if_name: "{{ interface_name }}"  # Interface name parameter
+        ip: "{{ interface_ip }}"
+        zone_name: "{{ interface_zone }}"  # Assign interface to a security zone
+        state: "present"
+      register: loopback_creation
+
+    - name: Display Loopback Interface creation result
+      debug:
+        msg: "Loopback Interface {{ interface_name }} creation result: {{ loopback_creation }}"

@@ -1,0 +1,31 @@
+- name: Automate Security Policy Rule Configuration on Palo Alto
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
+
+  tasks:
+    - name: Create Security Policy Rule
+      paloaltonetworks.panos.panos_security_rule:
+        provider: "{{ palo_provider }}"
+        rule_name: "myremo-rem"
+        description: "Allow VPN to any"
+        source_zone: ["any"]                 
+        destination_zone: ["any"]
+        source_ip: ["any"]
+        destination_ip: ["any"]
+        application: ["any"]
+        service: ["application-default"]
+        action: "allow"
+        log_start: true
+        log_end: true
+        commit: true

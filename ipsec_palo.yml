@@ -1,0 +1,47 @@
+---
+- name: Configurer un tunnel IPsec sur Palo Alto
+  hosts: 192.168.65.120
+  gather_facts: no
+  tasks:
+    - name: Configuration de la phase 1 d'IPsec (IKE)
+      paloaltonetworks.panos.panos_ipsec_phase1:
+        provider:
+          hostname: "{{ ansible_host }}"
+          username: "admin"
+          password: "admin"
+        name: "phase1-tunnel"
+        interface: "ethernet1/1"
+        local_ip: "192.168.65.120"
+        peer_ip: "192.168.65.130"
+        authentication_method: "pre-shared-key"
+        psk: "votre-psk"
+        encryption: "aes256"
+        hash: "sha256"
+        lifetime: 3600
+
+    - name: Configuration de la phase 2 d'IPsec
+      paloaltonetworks.panos.panos_ipsec_phase2:
+        provider:
+          hostname: "{{ ansible_host }}"
+          username: "admin"
+          password: "admin"
+        name: "phase2-tunnel"
+        phase1_name: "phase1-tunnel"
+        encryption: "aes256"
+        integrity: "sha256"
+        dh_group: "group14"
+        lifetime: 3600
+        local_ip: "192.168.65.120"
+        peer_ip: "192.168.65.130"
+        mode: "tunnel"
+
+    - name: Activer le tunnel IPsec
+      paloaltonetworks.panos.panos_ipsec_tunnel:
+        provider:
+          hostname: "{{ ansible_host }}"
+          username: "admin"
+          password: "admin"
+        name: "ipsec-tunnel"
+        phase1_name: "phase1-tunnel"
+        phase2_name: "phase2-tunnel"
+        enable: true

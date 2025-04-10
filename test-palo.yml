@@ -1,0 +1,15 @@
+# test-palo.yml
+- name: Test PAN-OS connectivity
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  collections:
+    - paloaltonetworks.panos
+
+  tasks:
+    - name: Get system info
+      panos_facts:
+        provider:
+          ip_address: "192.168.65.120"
+          username: "admin"
+          password: "admin"

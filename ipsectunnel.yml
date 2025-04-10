@@ -1,0 +1,36 @@
+---
+- name: Automate Creation of IPSec Tunnel on Palo Alto
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120" 
+      username: "admin"             
+      password: "admin"            
+      port: 443
+
+    ipsec_tunnel_name: "IPSec_TUNNEL2"
+    tunnel_interface: "tunnel.1"
+    ipsec_crypto_profile: "Suite-B-GCM-128"
+    ike_gateway_name: "GW-C-D"
+
+  tasks:
+
+    - name: Create the IPSec Tunnel
+      panos_ipsec_tunnel:
+        provider: "{{ palo_provider }}"
+        name: "{{ ipsec_tunnel_name }}"
+        tunnel_interface: "{{ tunnel_interface }}"
+        ipsec_profile: "{{ ipsec_crypto_profile }}"
+        ak_ike_gateway: "{{ ike_gateway_name }}"
+        state: "present"
+      register: ipsec_tunnel_creation
+
+    - name: Display IPSec Tunnel creation result
+      debug:
+        msg: "IPSec Tunnel {{ ipsec_tunnel_name }} creation result: {{ ipsec_tunnel_creation }}"

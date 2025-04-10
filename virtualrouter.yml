@@ -1,0 +1,38 @@
+- name: Automate Static Route Configuration on Palo Alto
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120" 
+      username: "admin"             
+      password: "admin"            
+      port: 443
+
+    static_route_name: "StaticRouteToNetworkpalo3"
+    destination_network: "10.1.7.0/24"
+    interface: "tunnel.1"
+    next_hop_ip: "10.1.7.4"
+    admin_dist: 10  
+    metric: 10
+
+  tasks:
+    - name: Create the Static Route
+      panos_static_route:
+        provider: "{{ palo_provider }}"
+        name: "{{ static_route_name }}"
+        destination: "{{ destination_network }}"
+        interface: "{{ interface }}"
+        nexthop: "{{ next_hop_ip }}"
+        admin_dist: "{{ admin_dist }}" 
+        metric: "{{ metric }}"
+        state: "present"
+      register: static_route_creation
+
+    - name: Display Static Route creation result
+      debug:
+        msg: "Static Route {{ static_route_name }} creation result: {{ static_route_creation }}"
