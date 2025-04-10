@@ -8,22 +8,22 @@
 
   vars:
     palo_provider:
-      ip_address: "192.168.65.120"  # Your Palo Alto firewall IP
-      username: "admin"             # Your Palo Alto admin username
-      password: "admin"             # Your Palo Alto admin password
-      port: 443                     # Default port for HTTPS
+      ip_address: "192.168.65.120"  
+      username: "admin"             
+      password: "admin"             
+      port: 443                    
 
-    interface_name: "loopback"     # Name of the loopback interface
-    interface_ip: "192.168.200.1/32"  # IP address for the loopback interface (use /32 for loopbacks)
-    interface_zone: "trust"           # Security zone for the interface (you can use a zone like trust)
+    interface_name: "loopback"    
+    interface_ip: "192.168.200.1/32"  
+    interface_zone: "trust"          
 
   tasks:
     - name: Create the Loopback Interface
       paloaltonetworks.panos.panos_interface:
         provider: "{{ palo_provider }}"
-        if_name: "{{ interface_name }}"  # Interface name parameter
+        if_name: "{{ interface_name }}"  
         ip: "{{ interface_ip }}"
-        zone_name: "{{ interface_zone }}"  # Assign interface to a security zone
+        zone_name: "{{ interface_zone }}"  
         state: "present"
       register: loopback_creation
 

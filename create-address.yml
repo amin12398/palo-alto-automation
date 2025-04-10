@@ -1,0 +1,24 @@
+---
+- name: Push test address object to Palo Alto
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
+
+  tasks:
+    - name: Create test address object
+      panos_address_object:
+        provider: "{{ palo_provider }}"
+        name: "Test-Server"
+        value: "10.10.10.10"
+        description: "This is a test address object"
+        tag: ["Test"]
