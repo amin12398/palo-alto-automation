@@ -1,0 +1,35 @@
+- name: Automate Creation of GlobalProtect Portal on Palo Alto
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
+
+    globalprotect_portal_name: "portal-2"
+    listen_interface: "vlan.2"
+    listen_ip: "10.2.2.1"       # Change selon ton IP VLAN2
+    ssl_tls_profile: "cert"  # Remplace par le nom exact de ton SSL/TLS Service Profile
+
+  tasks:
+
+    - name: Create GlobalProtect Portal
+      panos_globalprotect_portal:
+        provider: "{{ palo_provider }}"
+        name: "{{ globalprotect_portal_name }}"
+        interface: "{{ listen_interface }}"
+        ip_address: "{{ listen_ip }}"
+        ssl_tls_service_profile: "{{ ssl_tls_profile }}"
+        # Optional: You can add other parameters for Authentication, Agent, Client Config here if needed
+      register: portal_creation
+
+    - name: Display GlobalProtect Portal creation result
+      debug:
+        msg: "GlobalProtect Portal {{ globalprotect_portal_name }} creation result: {{ portal_creation }}"

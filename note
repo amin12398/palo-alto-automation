@@ -1,0 +1,4 @@
+alias activatepalo='source /mnt/c/Users/essao/test-palo/bin/activate'
+
+activatepalo
+

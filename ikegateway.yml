@@ -8,32 +8,41 @@
 
   vars:
     palo_provider:
-      ip_address: "192.168.65.120" 
-      username: "admin"             
-      password: "admin"            
-      port: 443                     
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
 
-    
-    ike_gateway_name_2: "GW-C-E"   
-    local_ip_2: "192.168.65.121"    
-    peer_ip_2: "192.168.65.131"   
-    pre_shared_key_2: "newsecretkey" 
-    ike_version_2: "ikev2"         
+    ike_gateway_name_2: "GW-C-E-KLM"
+    local_ip_2: "192.168.65.121"
+    peer_ip_2: "192.168.65.131"
+    pre_shared_key_2: "newsecretkey"
+    ike_version_2: "ikev2"
 
   tasks:
-    
+
     - name: Create the second IKE Gateway
       panos_ike_gateway:
         provider: "{{ palo_provider }}"
-        name: "{{ ike_gateway_name_2 }}"  
-        interface: "vlan.1"             
-        local_ip_address: "{{ local_ip_2 }}"      
-        peer_ip_value: "{{ peer_ip_2 }}"       
-        pre_shared_key: "{{ pre_shared_key_2 }}" 
-        version: "{{ ike_version_2 }}"            
+        name: "{{ ike_gateway_name_2 }}"
+        interface: "vlan.1"
+        local_ip_address: "{{ local_ip_2 }}"
+        peer_ip_value: "{{ peer_ip_2 }}"
+        pre_shared_key: "{{ pre_shared_key_2 }}"
+        version: "{{ ike_version_2 }}"
       register: ike_gateway_creation_2
 
-    
     - name: Display IKE Gateway 2 creation result
       debug:
         msg: "Second IKE Gateway {{ ike_gateway_name_2 }} creation result: {{ ike_gateway_creation_2 }}"
+
+    - name: Send IKE Gateway creation status to InfluxDB
+      uri:
+        url: "http://localhost:8086/write?db=ansible_metrics"
+        method: POST
+        body: >
+          ike_gateway_creation_status,host=windows_machine,result={{ 'success' if ike_gateway_creation_2.failed is not defined or not ike_gateway_creation_2.failed else 'failure' }} value=1
+        headers:
+          Content-Type: "text/plain"
+        status_code: 204
+      when: ike_gateway_creation_2 is defined

@@ -1,0 +1,27 @@
+- name: Create Local Certificate on Palo Alto using API Key
+  hosts: localhost
+  gather_facts: no
+  vars:
+    palo_ip: "192.168.65.120"
+    api_key: "LUFRPT14MW5xOEo1R09KVlBZNnpnemh0VHRBOWl6TGM9bXcwM3JHUGVhRlNiY0dCR0srNERUQT09"
+    certificate_name: "certiftest"
+    common_name: "certif.test.com"
+    key_length: "2048"
+    digest: "sha256"
+    days_valid: "365"
+
+  tasks:
+    - name: Create Local Certificate via direct API URL
+      uri:
+        url: "https://{{ palo_ip }}/api/?type=config&action=set&xpath={{ xpath | urlencode }}&element={{ element | urlencode }}&key={{ api_key }}"
+        method: GET
+        validate_certs: no
+        return_content: yes
+      vars:
+        xpath: /config/shared/certificate/entry[@name='{{ certificate_name }}']
+        element: "<common-name>{{ common_name }}</common-name><algorithm>RSA</algorithm><key-length>{{ key_length }}</key-length><digest>{{ digest }}</digest><days-valid>{{ days_valid }}</days-valid>"
+      register: create_cert_response
+
+    - name: Show API response
+      debug:
+        var: create_cert_response.content

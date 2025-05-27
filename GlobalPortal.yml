@@ -1,0 +1,45 @@
+- name: Configure GlobalProtect Portal using XML config
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
+
+    portal_name: "portal-3"
+    interface: "vlan"
+    ip_addr: "vlan2"
+    ssl_profile: "cert"
+
+  tasks:
+    - name: Set GlobalProtect Portal configuration via XML
+      paloaltonetworks.panos.panos_config:
+        provider: "{{ palo_provider }}"
+        xml: |
+          <config>
+            <devices>
+              <entry name="localhost.localdomain">
+                <deviceconfig>
+                  <global-protect>
+                    <portal>
+                      <entry name="{{ portal_name }}">
+                        <interface>{{ interface }}</interface>
+                        <ip-address>{{ ip_addr }}</ip-address>
+                        <ssl>
+                          <profile>{{ ssl_profile }}</profile>
+                        </ssl>
+                      </entry>
+                    </portal>
+                  </global-protect>
+                </deviceconfig>
+              </entry>
+            </devices>
+          </config>
+        commit: true
