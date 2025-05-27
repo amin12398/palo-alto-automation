@@ -5,6 +5,6 @@ deploy_paloalto_ike_gateway:
   stage: deploy
   image: williamyeh/ansible:debian10
   script:
-    - ansible-playbook -i hosts.ini GlobalPortal.yml
+    - ansible-playbook -i hosts.ini ikegateway.yml
   only:
     - main
