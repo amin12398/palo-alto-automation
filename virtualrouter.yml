@@ -13,7 +13,7 @@
       password: "admin"            
       port: 443
 
-    static_route_name: "StaticRouteToNetworkpalo3"
+    static_route_name: "StaticRouteToNetworkpalo4"
     destination_network: "10.1.7.0/24"
     interface: "tunnel.1"
     next_hop_ip: "10.1.7.4"
