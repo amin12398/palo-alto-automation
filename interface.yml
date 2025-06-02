@@ -8,25 +8,24 @@
 
   vars:
     palo_provider:
-      ip_address: "192.168.65.120"  
-      username: "admin"             
-      password: "admin"             
-      port: 443                    
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
 
-    interface_name: "loopback"    
-    interface_ip: "192.168.200.1/32"  
-    interface_zone: "trust"          
+    interface_name: "loopback.2"
+    interface_ip: "192.168.200.1/32"
 
   tasks:
-    - name: Create the Loopback Interface
-      paloaltonetworks.panos.panos_interface:
+    - name: Create Loopback Interface
+      paloaltonetworks.panos.panos_loopback_interface:
         provider: "{{ palo_provider }}"
-        if_name: "{{ interface_name }}"  
-        ip: "{{ interface_ip }}"
-        zone_name: "{{ interface_zone }}"  
+        if_name: "{{ interface_name }}"
+        ip: ["{{ interface_ip }}"]
+        comment: "Created via Ansible"
         state: "present"
-      register: loopback_creation
+      register: loopback_result
 
-    - name: Display Loopback Interface creation result
+    - name: Show result
       debug:
-        msg: "Loopback Interface {{ interface_name }} creation result: {{ loopback_creation }}"
+        var: loopback_result
