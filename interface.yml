@@ -13,10 +13,21 @@
       password: "admin"
       port: 443
 
-    interface_name: "loopback.2"
-    interface_ip: "192.168.200.1/32"
+  vars_prompt:
+    - name: interface_name_input
+      prompt: "Enter the name of the loopback interface (e.g. loopback.3)"
+      private: no
+
+    - name: interface_ip_input
+      prompt: "Enter the IP address with CIDR (e.g. 192.168.200.1/32)"
+      private: no
 
   tasks:
+    - name: Set interface variables from environment or prompt
+      set_fact:
+        interface_name: "{{ interface_name | default(interface_name_input) }}"
+        interface_ip: "{{ interface_ip | default(interface_ip_input) }}"
+
     - name: Create Loopback Interface
       paloaltonetworks.panos.panos_loopback_interface:
         provider: "{{ palo_provider }}"
@@ -28,4 +39,4 @@
 
     - name: Show result
       debug:
-        var: loopback_result
+        msg: "Loopback interface {{ interface_name }} creation result: {{ loopback_result }}"

@@ -1,4 +1,4 @@
-- name: Automate Creation of Another IKE Gateway on Palo Alto
+- name: Automate Creation of Another IKE Gateway on Palo Alto 
   hosts: localhost
   connection: local
   gather_facts: no
@@ -13,13 +13,32 @@
       password: "admin"
       port: 443
 
-    ike_gateway_name_2: "GW-C-E-KLMNTP"
-    local_ip_2: "192.168.65.121"
-    peer_ip_2: "192.168.65.131"
-    pre_shared_key_2: "newsecretkey"
-    ike_version_2: "ikev2"
+    ike_version_2: "ikev1"  # Version IKE fixée
+
+  vars_prompt:
+    - name: ike_gateway_name_input
+      prompt: "Enter the IKE Gateway name"
+      private: no
+
+    - name: local_ip_input
+      prompt: "Enter the Local IP address"
+      private: no
+
+    - name: peer_ip_input
+      prompt: "Enter the Peer IP address"
+      private: no
+
+    - name: pre_shared_key_input
+      prompt: "Enter the Pre-Shared Key"
+      private: yes
 
   tasks:
+    - name: Set values based on environment or prompt
+      set_fact:
+        ike_gateway_name_2: "{{ ike_gateway_name_2 | default(ike_gateway_name_input) }}"
+        local_ip_2: "{{ local_ip_2 | default(local_ip_input) }}"
+        peer_ip_2: "{{ peer_ip_2 | default(peer_ip_input) }}"
+        pre_shared_key_2: "{{ pre_shared_key_2 | default(pre_shared_key_input) }}"
 
     - name: Create the second IKE Gateway
       panos_ike_gateway:
@@ -35,14 +54,3 @@
     - name: Display IKE Gateway 2 creation result
       debug:
         msg: "Second IKE Gateway {{ ike_gateway_name_2 }} creation result: {{ ike_gateway_creation_2 }}"
-
-    - name: Send IKE Gateway creation status to InfluxDB
-      uri:
-        url: "http://localhost:8086/write?db=ansible_metrics"
-        method: POST
-        body: >
-          ike_gateway_creation_status,host=windows_machine,result={{ 'success' if ike_gateway_creation_2.failed is not defined or not ike_gateway_creation_2.failed else 'failure' }} value=1
-        headers:
-          Content-Type: "text/plain"
-        status_code: 204
-      when: ike_gateway_creation_2 is defined
