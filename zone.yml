@@ -13,22 +13,11 @@
       password: "admin"
       port: 443
 
-  vars_prompt:
-    - name: zone_name_input
-      prompt: "Enter the Zone name (e.g., Trust)"
-      private: no
-
-    - name: interface_list_input
-      prompt: "Enter the interface(s) to assign (comma-separated, e.g., ethernet1/2,ethernet1/3)"
-      private: no
-
-    - name: include_list_input
-      prompt: "Enter Include list (comma-separated CIDRs, e.g., 192.168.1.0/24)"
-      private: no
-
-    - name: exclude_list_input
-      prompt: "Enter Exclude list (comma-separated IPs, e.g., 192.168.1.100,192.168.1.101)"
-      private: no
+    
+    zone_name_input: "Trust"
+    interface_list_input: "loopback"
+    include_list_input: "192.168.1.0/24"
+    exclude_list_input: "192.168.1.100,192.168.1.101"
 
   tasks:
     - name: Parse interfaces from comma-separated input
@@ -49,7 +38,7 @@
         zone: "{{ zone_name_input }}"
         mode: "layer3"
         interface: "{{ interface_list }}"
-        enable_userid: true
+        enable_userid: true 
         include_acl: "{{ include_list }}"
         exclude_acl: "{{ exclude_list }}"
       register: zone_creation

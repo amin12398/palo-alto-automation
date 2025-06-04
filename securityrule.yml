@@ -1,0 +1,62 @@
+- name: Automate Security Rule Creation on Palo Alto
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars_prompt:
+    - name: "rule_name"
+      prompt: "Enter the rule name"
+      private: no
+
+    - name: "source_zone"
+      prompt: "Enter the source zone (comma-separated if multiple)"
+      private: no
+
+    - name: "destination_zone"
+      prompt: "Enter the destination zone (comma-separated if multiple)"
+      private: no
+
+    - name: "source_address"
+      prompt: "Enter the source address (comma-separated if multiple)"
+      private: no
+
+    - name: "destination_address"
+      prompt: "Enter the destination address (comma-separated if multiple)"
+      private: no
+
+    - name: "application"
+      prompt: "Enter the application (comma-separated if multiple)"
+      private: no
+
+    - name: "service"
+      prompt: "Enter the service (e.g. application-default)"
+      private: no
+
+    - name: "action"
+      prompt: "Enter the action (allow, deny, drop, etc.)"
+      private: no
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
+
+  tasks:
+    - name: Create a security rule
+      panos_security_rule:
+        provider: "{{ palo_provider }}"
+        rule_name: "{{ rule_name }}"
+        description: "Interactive security rule"
+        source_zone: "{{ source_zone.split(',') }}"
+        destination_zone: "{{ destination_zone.split(',') }}"
+        source_ip: "{{ source_address.split(',') }}"
+        destination_ip: "{{ destination_address.split(',') }}"
+        application: "{{ application.split(',') }}"
+        service: "{{ service }}"
+        action: "{{ action }}"
+        state: "present"

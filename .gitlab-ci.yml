@@ -1,10 +1,47 @@
 stages:
   - deploy
-
-deploy_paloalto_ike_gateway:
+deploy_loopback:
   stage: deploy
-  image: williamyeh/ansible:debian10
   script:
-    - ansible-playbook -i hosts.ini ikegateway.yml
-  only:
-    - main
+    - source /mnt/c/Users/essao/test-palo/bin/activate
+    - ansible-galaxy collection install paloaltonetworks.panos
+    - echo "Starting Loopback Interface deployment..."
+    - ansible-playbook interface.yml -i hosts.ini -e "interface_name=$interface_name interface_ip=$interface_ip"
+  tags:
+    - local-runner
+deploy_tunel:
+  stage: deploy
+  script:
+    - source /mnt/c/Users/essao/test-palo/bin/activate
+    - ansible-galaxy collection install paloaltonetworks.panos
+    - echo "Starting tunel Interface deployment..."
+    - ansible-playbook interface.yml -i hosts.ini -e "interface_name_tunel=$interface_name_tunel interface_ip_tunel=$interface_ip_tunel"
+  tags:
+    - local-runner
+deploy_ZoneToInterface:
+  stage: deploy
+  script:
+    - source /mnt/c/Users/essao/test-palo/bin/activate
+    - ansible-galaxy collection install paloaltonetworks.panos
+    - echo "Starting Zone deployment..."
+    - ansible-playbook zone.yml -i hosts.ini -e "zone_name_input=$zone_name_input interface_list=$interface_list include_list=$include_list exclude_list=$exclude_list " #interface_liste (replace with interface_name )
+  tags:
+    - local-runner
+deploy_ike_gateway:
+  stage: deploy
+  script:
+    - source /mnt/c/Users/essao/test-palo/bin/activate
+    - ansible-galaxy collection install paloaltonetworks.panos
+    - echo "Starting IKE Gateway deployment..."
+    - ansible-playbook ikegateway.yml -i hosts.ini -e "ike_gateway_name_2=$IKE_GATEWAY_NAME_2 local_ip_2=$LOCAL_IP_2 peer_ip_2=$PEER_IP_2 pre_shared_key_2=$PRE_SHARED_KEY_2"
+  tags:    
+    - local-runner
+deploy_security_role:
+  stage: deploy
+  script:
+    - source /mnt/c/Users/essao/test-palo/bin/activate
+    - ansible-galaxy collection install paloaltonetworks.panos
+    - echo "Starting IKE Gateway deployment..."
+    - ansible-playbook ikegateway.yml -i hosts.ini -e "ike_gateway_name_2=$IKE_GATEWAY_NAME_2 local_ip_2=$LOCAL_IP_2 peer_ip_2=$PEER_IP_2 pre_shared_key_2=$PRE_SHARED_KEY_2"
+  tags:    
+    - local-runner

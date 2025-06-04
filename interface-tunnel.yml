@@ -1,0 +1,46 @@
+- name: Create Tunnel Interface with panos_op
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
+
+    tunnel_interface_name: "tunnel.1"
+    tunnel_ip: "10.10.10.1/30"
+    management_profile: "Ping"
+
+  tasks:
+    - name: Set Tunnel Interface IP
+      paloaltonetworks.panos.panos_op:
+        provider: "{{ palo_provider }}"
+        cmd: >
+          set network interface tunnel units {{ tunnel_interface_name.split('.')[1] }} ip {{ tunnel_ip }}
+
+    - name: Set Tunnel Interface Management Profile
+      paloaltonetworks.panos.panos_op:
+        provider: "{{ palo_provider }}"
+        cmd: >
+          set network interface tunnel units {{ tunnel_interface_name.split('.')[1] }} management-profile {{ management_profile }}
+
+    - name: Enable Tunnel Interface
+      paloaltonetworks.panos.panos_op:
+        provider: "{{ palo_provider }}"
+        cmd: >
+          set network interface tunnel units {{ tunnel_interface_name.split('.')[1] }} enable yes
+
+    - name: Commit configuration
+      paloaltonetworks.panos.panos_commit:
+        provider: "{{ palo_provider }}"
+        sync: yes
+
+    - name: Show commit result
+      debug:
+        msg: "Tunnel interface {{ tunnel_interface_name }} created and committed."
