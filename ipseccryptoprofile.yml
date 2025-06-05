@@ -1,0 +1,24 @@
+- name: Test PAN-OS connection
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    provider:
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
+
+  tasks:
+    - name: Get device system info
+      panos_op:
+        provider: "{{ provider }}"
+        cmd: "show system info"
+      register: result
+
+    - debug:
+        var: result

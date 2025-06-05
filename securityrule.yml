@@ -1,4 +1,4 @@
-- name: Automate Security Rule Creation on Palo Alto
+- name: Automate Assignment of Security Profiles to a Rule on Palo Alto
   hosts: localhost
   connection: local
   gather_facts: no
@@ -7,36 +7,52 @@
     - paloaltonetworks.panos
 
   vars_prompt:
-    - name: "rule_name"
-      prompt: "Enter the rule name"
+    - name: rule_name
+      prompt: "Enter rule name (e.g. Allow-Web-Traffic)"
       private: no
 
-    - name: "source_zone"
-      prompt: "Enter the source zone (comma-separated if multiple)"
+    - name: source_zone
+      prompt: "Enter source zone(s), comma-separated (e.g. Trust)"
       private: no
 
-    - name: "destination_zone"
-      prompt: "Enter the destination zone (comma-separated if multiple)"
+    - name: destination_zone
+      prompt: "Enter destination zone(s), comma-separated (e.g. Untrust)"
       private: no
 
-    - name: "source_address"
-      prompt: "Enter the source address (comma-separated if multiple)"
+    - name: source_ip
+      prompt: "Enter source IP(s), comma-separated (e.g. any)"
       private: no
 
-    - name: "destination_address"
-      prompt: "Enter the destination address (comma-separated if multiple)"
+    - name: destination_ip
+      prompt: "Enter destination IP(s), comma-separated (e.g. any)"
       private: no
 
-    - name: "application"
-      prompt: "Enter the application (comma-separated if multiple)"
+    - name: application
+      prompt: "Enter application(s), comma-separated (e.g. web-browsing)"
       private: no
 
-    - name: "service"
-      prompt: "Enter the service (e.g. application-default)"
+    - name: service
+      prompt: "Enter service (e.g. application-default)"
       private: no
 
-    - name: "action"
-      prompt: "Enter the action (allow, deny, drop, etc.)"
+    - name: action
+      prompt: "Enter action (allow, deny, drop, etc.)"
+      private: no
+
+    - name: antivirus
+      prompt: "Enter Antivirus profile name (e.g. default)"
+      private: no
+
+    - name: spyware
+      prompt: "Enter Spyware profile name (e.g. default)"
+      private: no
+
+    - name: vulnerability
+      prompt: "Enter Vulnerability profile name (e.g. default)"
+      private: no
+
+    - name: url_filtering
+      prompt: "Enter URL Filtering profile name (e.g. default)"
       private: no
 
   vars:
@@ -47,16 +63,24 @@
       port: 443
 
   tasks:
-    - name: Create a security rule
+    - name: Add security profiles to rule
       panos_security_rule:
         provider: "{{ palo_provider }}"
         rule_name: "{{ rule_name }}"
-        description: "Interactive security rule"
         source_zone: "{{ source_zone.split(',') }}"
         destination_zone: "{{ destination_zone.split(',') }}"
-        source_ip: "{{ source_address.split(',') }}"
-        destination_ip: "{{ destination_address.split(',') }}"
+        source_ip: "{{ source_ip.split(',') }}"
+        destination_ip: "{{ destination_ip.split(',') }}"
         application: "{{ application.split(',') }}"
         service: "{{ service }}"
         action: "{{ action }}"
-        state: "present"
+        antivirus: "{{ antivirus }}"
+        spyware: "{{ spyware }}"
+        vulnerability: "{{ vulnerability }}"
+        url_filtering: "{{ url_filtering }}"
+        state: present
+      register: profile_rule_result
+
+    - name: Show result of security profile update
+      debug:
+        var: profile_rule_result
