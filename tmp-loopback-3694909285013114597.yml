@@ -1,0 +1,26 @@
+- name: Automate Loopback Interface Creation on Palo Alto
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
+
+    interface_name: "Loopback22"
+    interface_ip: "192.168.65.90"
+
+  tasks:
+    - name: Create Loopback Interface
+      paloaltonetworks.panos.panos_loopback_interface:
+        provider: "{{ palo_provider }}"
+        if_name: "{{ interface_name }}"
+        ip: ["{{ interface_ip }}"]
+        comment: "Created via Ansible"
+        state: present

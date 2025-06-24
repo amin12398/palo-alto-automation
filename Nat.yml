@@ -1,0 +1,50 @@
+- name: Automate Creation of NAT Policy on Palo Alto
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    palo_provider:
+      ip_address: "192.168.65.120"
+      username: "admin"
+      password: "admin"
+      port: 443
+
+  vars_prompt:
+    - name: nat_policy_name
+      prompt: "Enter the NAT policy name"
+      private: no
+
+    - name: source_zone
+      prompt: "Enter the Source Zone (e.g., Trust)"
+      private: no
+
+    - name: destination_zone
+      prompt: "Enter the Destination Zone (e.g., Trust)"
+      private: no
+
+    - name: tag_name
+      prompt: "Enter the tag name (e.g., Test)"
+      private: no
+
+  tasks:
+    - name: Create NAT Policy (no source translation)
+      panos_nat_rule:
+        provider: "{{ palo_provider }}"
+        name: "{{ nat_policy_name }}"
+        from_zones: ["{{ source_zone }}"]
+        to_zones: ["{{ destination_zone }}"]
+        to_interface: "any"
+        source_addresses: ["any"]
+        destination_addresses: ["any"]
+        service: "any"
+        tags: ["{{ tag_name }}"]
+        nat_type: "ipv4"
+        state: "present"
+
+    - name: Show result
+      debug:
+        msg: "NAT policy '{{ nat_policy_name }}' created successfully."

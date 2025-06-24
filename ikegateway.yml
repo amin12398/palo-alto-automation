@@ -13,7 +13,7 @@
       password: "admin"
       port: 443
 
-    ike_version_2: "ikev1"  # Version IKE fixée
+    ike_version_2: "ikev1"  
 
   vars_prompt:
     - name: ike_gateway_name_input
